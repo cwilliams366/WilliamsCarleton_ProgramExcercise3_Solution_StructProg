@@ -23,8 +23,8 @@ char  CLOSE_SLASH_ERR_MESSAGE [500] = { "Error! Invalid character entry. Must en
     //Asterisk Essentials
     int ASTERISK_ERROR = -2;
     int CLOSE_ASTERISK_ERROR = -4;
-    char  ASTERISK_ERR_MESSAGE [500] = {"Error! Expecting a succeeding asterisk character, after the first initial forward slash!\n"};
-    char  CLOSE_ASTERISK_ERR_MESSAGE [500] = {"Error! Expecting preceeding asterisk character, before the final forward slash !\n"};
+    char  ASTERISK_ERR_MESSAGE [500] = {"Error! Expecting the second succeeding asterisk character, after the first initial forward slash!\n"};
+    char  CLOSE_ASTERISK_ERR_MESSAGE [500] = {"Error! Expecting the second last preceeding asterisk character, before the final forward slash !\n"};
 
     //Create a variable for upcoming comment
    char userComment [5000];
@@ -153,7 +153,7 @@ int GetComment(char* comment)
         }
 
       //Check for the forward slash '/' for the last character in string
-        if(comment[stringLength-1] != '/')
+        if(comment[stringLength-1] != '/' || comment[stringLength-1] == '*')
         {
           return CLOSE_SLASH_ERROR;
         }
