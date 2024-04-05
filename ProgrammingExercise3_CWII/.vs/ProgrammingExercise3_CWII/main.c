@@ -10,41 +10,58 @@ Assignment: Write and test the code to implement the state diagram of Problem 1.
 #include <stdio.h>
 #include <errno.h>
 #include <ctype.h>
+#include <string.h>
 #include "errors.h"
 
     //Global Variables
     //Slash Essentials
     int SLASH_ERROR = -1;
-    char * SLASH_ERR_MESSAGE [] = { "Error! Invalid character entry. Must be the forward slash character."};
+    int CLOSE_SLASH_ERROR = -3;
+    char  SLASH_ERR_MESSAGE [500] = { "Error! Invalid character entry. Must begin comment with a forward slash character.\n"};
+char  CLOSE_SLASH_ERR_MESSAGE [500] = { "Error! Invalid character entry. Must end with the forward slash character.\n"};
 
     //Asterisk Essentials
     int ASTERISK_ERROR = -2;
-    char * ASTERISK_ERR_MESSAGE [] = {"Error! Expecting an asterisk character!"};
+    int CLOSE_ASTERISK_ERROR = -4;
+    char  ASTERISK_ERR_MESSAGE [500] = {"Error! Expecting a succeeding asterisk character, after the first initial forward slash!\n"};
+    char  CLOSE_ASTERISK_ERR_MESSAGE [500] = {"Error! Expecting preceeding asterisk character, before the final forward slash !\n"};
 
-    //Comment
-    char * COMMENT [];
     //Create a variable for upcoming comment
-    char * userComment [];
-    
+   char userComment [5000];
+
 int main()
 {
+ 
+  //Obtain the result of the syntax analyzer
+  int result = GetComment("/**This is the comment that will be used for the homework assignment. Also, God is good all the time!**/");
+  
     //Call the function to evaluate the comment string
-    if(GetComment("/**This is the comment that will be used for the homework assignment. Also, God is good all the time!**/") == SLASH_ERROR) 
+    if(result == SLASH_ERROR) 
     {
         //Print the slash error message
         perror(SLASH_ERR_MESSAGE);
     }
-    else if(GetComment("/**This is the comment that will be used for the homework assignment. Also, God is good all the time!**/") == ASTERISK_ERROR)
+    else if(result == ASTERISK_ERROR)
     {
         //Print the asterisk error message
         perror(ASTERISK_ERR_MESSAGE);
     }
-    else
+    else if(result == CLOSE_SLASH_ERROR)
     {
-        //Print the comment out to console
-        printf(COMMENT);
+        //Print the slash error message
+        perror(CLOSE_SLASH_ERR_MESSAGE);
     }
-	return 0;
+    else if(result == CLOSE_ASTERISK_ERROR)
+    {
+      //Print the asterisk error message
+      perror(CLOSE_ASTERISK_ERR_MESSAGE);
+    }
+  else
+    {
+      //Print the comment
+    }
+  
+  return 0;
 }
 
 /*
@@ -56,33 +73,38 @@ asterisk and forward slash.
 */
 int GetComment(char* comment)
 {
-    //User's decision
-    char decision = ' ';
-    //Set size of comment
-    int stringLength = 0;
-    //Prompt user if they wish to enter their own comment or not and take input
-    printf("Are you entering a comment?\n");
-    scanf("%c",&decision);
-    //Ensure that Y or N has been entered
-    while(decision != isupper('y') || decision != islower('y') || decision != isupper('n') || decision != isupper('n'))
+  //User's decision
+  char decision = ' ';
+  
+  //Set size of comment
+  size_t stringLength = 0;
+  
+  //Prompt user if they wish to enter their own comment or not and take input
+  printf("Are you entering a comment?\n");
+  scanf("%c",&decision);
+  
+  //Ensure that Y or N has been entered
+  while((decision < 'N' || decision > 'Y') && (decision < 'n' || decision > 'y'))
     {
-        printf("Please enter either 'Y' or 'N'\n");
+        printf("Please enter either 'Y', 'y', 'n' or 'N'\n");
         scanf("%c",&decision);
+        getchar();
     }
+  
+    //If the user wishes to enter their own comment, prompt them to enter it
     //Evaluate the decision, if yes
-    if(decision == isupper('y') || decision == islower('y'))
+    if(decision == 'y' || decision == 'Y')
     {
 
         printf("Enter the comment: ");
-        scanf("%s",&userComment);
+        scanf("%s",userComment);
+       
 
         //Get size of comment
-        stringLength = strlen(comment);
-        //Get more characters
-        char input =  ' ';
-            
+        stringLength = strlen(userComment);
+
         //Check for the forward slash '/' for the first character in string
-        if(userComment[0] != '/')
+        if(userComment[0] != '/') 
         {
             return SLASH_ERROR;
         }
@@ -92,31 +114,29 @@ int GetComment(char* comment)
             return ASTERISK_ERROR;
         }
 
-        //Get all character input from user and check for asterisks
-        do
+        //Check for the asterisk '*' for the second last character in string
+        if(userComment[stringLength-2] != '*')
         {
-            //Get input
-            scanf("%c",&input);
-            strcat(userComment, input);
-            while(input =! '*')
-             {
-                scanf("%c",&input);
-                strcat(userComment, input);
-             }
-        }while(input != '/');
+          return CLOSE_ASTERISK_ERROR;
+        }
         
+      //Check for the forward slash '/' for the last character in string
+        if(userComment[stringLength-1] != '/')
+        {
+          return CLOSE_SLASH_ERROR;
+        }
+      
         //Print the comment afterwards
-       strcpy(&COMMENT,&userComment);
-        return 1;
+        printf("%s",userComment);
 
     }//If decision is no
     else
     {
         //Get size of comment
         stringLength = strlen(comment);
-            
-        //Check for the forward slash '/' for the first character in string
-        if(comment[0] != '/')
+    
+      //Check for the forward slash '/' for the first character in string
+        if(comment[0] != '/') 
         {
             return SLASH_ERROR;
         }
@@ -126,19 +146,21 @@ int GetComment(char* comment)
             return ASTERISK_ERROR;
         }
 
-        //Check for the asterisk in the second last character in the string
+        //Check for the asterisk '*' for the second last character in string
         if(comment[stringLength-2] != '*')
         {
-            return ASTERISK_ERROR;
+          return CLOSE_ASTERISK_ERROR;
         }
-           //Check for the forward slash '/' for the last character in string
-        else if(comment[stringLength-1] != '/')
+
+      //Check for the forward slash '/' for the last character in string
+        if(comment[stringLength-1] != '/')
         {
-            return SLASH_ERROR;
+          return CLOSE_SLASH_ERROR;
         }
-
+      
         //Print the comment afterwards
-       strcpy(&COMMENT,&comment);
-
-       return 1;
+       printf("%s",comment);
+  }
+  
+  return 1;
 }
