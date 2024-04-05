@@ -113,7 +113,13 @@ int GetComment(char* comment)
         {
             return ASTERISK_ERROR;
         }
-
+      
+      //If there an asterisk is the final character of the commented string
+       if(userComment[stringLength-1] == '*')
+       {
+        return CLOSE_SLASH_ERROR;
+      }
+ 
         //Check for the asterisk '*' for the second last character in string
         if(userComment[stringLength-2] != '*')
         {
@@ -146,6 +152,12 @@ int GetComment(char* comment)
             return ASTERISK_ERROR;
         }
 
+        //If there an asterisk is the final character of the commented string
+        if(comment[stringLength-1] == '*')
+        {
+          return CLOSE_SLASH_ERROR;
+        }
+      
         //Check for the asterisk '*' for the second last character in string
         if(comment[stringLength-2] != '*')
         {
@@ -153,7 +165,7 @@ int GetComment(char* comment)
         }
 
       //Check for the forward slash '/' for the last character in string
-        if(comment[stringLength-1] != '/' || comment[stringLength-1] == '*')
+        if(comment[stringLength-1] != '/')
         {
           return CLOSE_SLASH_ERROR;
         }
